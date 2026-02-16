@@ -1,0 +1,10 @@
+[project]
+name = "uni-lm"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi[standard]>=0.129.0",
+    "litellm>=1.81.12",
+]
