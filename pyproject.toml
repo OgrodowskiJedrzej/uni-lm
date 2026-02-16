@@ -1,10 +1,12 @@
 [project]
 name = "uni-lm"
 version = "0.1.0"
-description = "Add your description here"
+description = "LLM orchestrator for students with intent classification and streaming responses"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "fastapi[standard]>=0.129.0",
     "litellm>=1.81.12",
+    "python-dotenv>=1.0.0",
+    "pyyaml>=6.0",
 ]
