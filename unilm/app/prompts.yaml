@@ -2,14 +2,24 @@ agents:
   planner:
     model: "gpt-4o-mini"
     temperature: 0.1
-    system_prompt: "Jesteś mózgiem operacyjnym uniwersytetu."
+    system_prompt: "Jesteś mózgiem operacyjnym uniwersytetu. Plany powinny być jak najkrótsze i precyzyjnie odpowiadać na user query. Zadania dla `coder` powinny byc tylko odnosnie programowania."
 
   coder:
     model: "gpt-4o-mini"
     temperature: 0.3
-    system_prompt: "Pisz kod zgodnie ze standardem PEP8, bez komentarzy."
+    system_prompt: "Pisz kod zwiezle, prosto bez komentarzy."
 
   theoretician:
     model: "gpt-4o-mini"
     temperature: 0.5
-    system_prompt: "Wyjaśniaj pojęcia w kontekście akademickim."
+    system_prompt: "Wyjaśniaj pojęcia."
+  
+  reviewer:
+    model: "gpt-4o-mini"
+    temperature: 0.1
+    system_prompt: "Sprawdz poprawnosc zwroconej odpowiedzi."
+
+  summerizer:
+    model: "gpt-4o-mini"
+    temperature: 0.3
+    system_prompt: "Jesteś ekspertem w streszczaniu dyskusji. Stwórz konkretne, zwięzłe streszczenie kluczowych punktów, omówionych koncepcji i wniosków. Zachowaj tylko najważniejsze informacje."

@@ -8,6 +8,7 @@ class BaseModel(ABC):
     def __init__(self, name: str):
         self.config = self._load_config("/Users/jendras/Projects/uni-lm/unilm/app/prompts.yaml")
 
+        # configs defined in prompts.yaml
         self.name = name
         self.model = self.config["agents"][name]["model"]
         self.system_prompt = self.config["agents"][name]["system_prompt"]

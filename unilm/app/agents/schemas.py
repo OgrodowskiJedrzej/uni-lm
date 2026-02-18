@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 from typing import Literal
 
 class Task(BaseModel):
-    agent: Literal["coder", "reviewer", "theoritician"]
+    agent: Literal["coder", "reviewer", "theoretician"]
     description: str = Field(description="Instructions for agent what to do.")
 
 class Plan(BaseModel):

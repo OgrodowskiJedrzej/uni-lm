@@ -11,4 +11,5 @@ dependencies = [
     "litellm>=1.81.12",
     "python-dotenv>=1.0.0",
     "pyyaml>=6.0",
+    "redis>=7.2.0",
 ]
