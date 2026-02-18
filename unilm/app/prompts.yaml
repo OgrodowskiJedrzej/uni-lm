@@ -1,16 +1,15 @@
 agents:
   planner:
-    model: "gemini/gemini-1.5-pro"
+    model: "gpt-4o-mini"
     temperature: 0.1
-    system_prompt: "Jesteś mózgiem operacyjnym uniwersytetu..."
-    fallback_model: "openai/gpt-4o" # LiteLLM obsłuży to automatycznie
+    system_prompt: "Jesteś mózgiem operacyjnym uniwersytetu."
 
   coder:
-    model: "ollama/deepseek-coder"
-    temperature: 0.0
-    system_prompt: "Pisz kod zgodnie ze standardem PEP8..."
+    model: "gpt-4o-mini"
+    temperature: 0.3
+    system_prompt: "Pisz kod zgodnie ze standardem PEP8, bez komentarzy."
 
   theoretician:
-    model: "openai/gpt-4o-mini"
+    model: "gpt-4o-mini"
     temperature: 0.5
-    system_prompt: "Wyjaśniaj pojęcia w kontekście akademickim..."
+    system_prompt: "Wyjaśniaj pojęcia w kontekście akademickim."

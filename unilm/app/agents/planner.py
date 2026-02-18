@@ -4,7 +4,7 @@ from .schemas import Plan
 
 class PlannerAgent(BaseModel):
     def __init__(self):
-        super().__init__(name = "Planner")
+        super().__init__(name = "planner")
         
     async def create_plan(self, query: str) -> list:
         response = await litellm.acompletion(
@@ -18,4 +18,3 @@ class PlannerAgent(BaseModel):
         )
         content = response.choices[0].message.content
         return Plan.model_validate_json(content)
-

@@ -1,5 +1,5 @@
 import litellm
-from abc import ABC
+from abc import ABC, abstractmethod
 import yaml
 
 from .schemas import AgentOutput
@@ -17,7 +17,6 @@ class BaseModel(ABC):
     def _load_config(self, path: str):
         with open(path, 'r', encoding='utf-8') as f:
             return yaml.safe_load(f)
-
 
     async def run_agent(self, task: str, context: dict | None = None):
         response = await litellm.acompletion(
