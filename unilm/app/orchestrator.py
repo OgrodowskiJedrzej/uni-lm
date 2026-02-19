@@ -6,8 +6,8 @@ from langgraph.graph import StateGraph, START, END
 import litellm
 from litellm.caching.caching import Cache
 
-from agents.registry import AgentRegistry
-from agents.schemas import Plan, AgentOutput
+from agents.utils.registry import AgentRegistry
+from agents.utils.schemas import Plan, AgentOutput
 from memory import RedisMemoryManager
 
 class AgentState(TypedDict):
@@ -34,9 +34,9 @@ async def plan_node(state: AgentState):
 
 async def execute_tasks_node(state: AgentState):
     current_plan = state["plan"] 
-    new_results = []
     session_id = state.get("session_id")
 
+    new_results = []
     for task in current_plan.tasks:
         agent = registry.get_agent(task.agent)
         
@@ -78,8 +78,9 @@ async def test():
     }
     async for event in orchestrator.astream(input_state):
         print(event)
-    print(10*'x')
-    print(memory.get_history(session_id=session_id))
+    input_state['query'] = "O co sie zapytalem poprzednio?"
+    async for event in orchestrator.astream(input_state):
+        print(event)
     
 
 if __name__ == "__main__":
