@@ -36,7 +36,7 @@ class Orchestrator():
         planner = self.registry.get_agent(name="planner")
         self.memory.add_message(state["session_id"], "user", state["query"])
         plan = await planner.create_plan(state["query"])
-        logger.debug(plan)
+        logger.debug(f"Plan: {plan}")
         return {"plan": plan}
     
     async def execute_node(self, state: AgentState) -> dict[str, list[dict]]:
@@ -44,11 +44,12 @@ class Orchestrator():
         session_id = state.get("session_id")
 
         new_results = []
+        
         for task in current_plan.tasks:
             agent = self.registry.get_agent(task.agent)
-
             context = {"plan_logic": current_plan.thought_process}
             context["memory"] = self.memory.get_context(session_id)
+            logger.debug(f"Context: {context}")
             logger.debug(f"Task: {task.description} | Agent: {task.agent}")
             output = await agent.run_agent(
                 task.description,
@@ -57,7 +58,7 @@ class Orchestrator():
             new_results.append(output)
             self.memory.add_message(session_id, "assistant",
                             output.content, agent=task.agent)
-
+            logger.debug(f"Results: {new_results}")
         return {"results": new_results}
     
     def compile_workflow(self):
@@ -93,6 +94,7 @@ class Orchestrator():
             if node_name == "executor":
                 for result in node_data.get("results", []):
                     if hasattr(result, 'content'):
-                        yield f"data: {json.dumps({'content': result.content, 'agent': result.agent})}\n\n"
+                        formatted_content = f"\n\n{result.content}\n\n"
+                        yield f"data: {json.dumps({'content': formatted_content, 'agent': result.agent})}\n\n"
                     elif node_name == "planner":
                         logger.info(f"Plan created for session {session_id}")
