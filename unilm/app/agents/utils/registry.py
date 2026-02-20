@@ -1,10 +1,11 @@
 from typing import overload, Literal
-from ..base import BaseModel
-from ..coding_agent import CodingAgent
-from ..planner import PlannerAgent
-from ..summerizer import SummerizerAgent
-from ..theoretician import TheoreticianAgent
-from ..reviewer import ReviewerAgent
+
+from agents.base import BaseModel
+from agents.coding_agent import CodingAgent
+from agents.planner import PlannerAgent
+from agents.summerizer import SummerizerAgent
+from agents.theoretician import TheoreticianAgent
+from agents.reviewer import ReviewerAgent
 
 class AgentRegistry:
     def __init__(self):

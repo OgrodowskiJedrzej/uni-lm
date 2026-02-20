@@ -1,4 +1,4 @@
-from .base import BaseModel
+from app.agents.base import BaseModel
 
 
 class ReviewerAgent(BaseModel):

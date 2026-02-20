@@ -1,8 +1,9 @@
-import litellm
-from abc import ABC, abstractmethod
 import yaml
+from abc import ABC
 
-from .utils.schemas import AgentOutput
+import litellm
+
+from app.agents.utils.schemas import AgentOutput
 
 class BaseModel(ABC):
     def __init__(self, name: str):

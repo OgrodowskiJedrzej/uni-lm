@@ -1,19 +1,19 @@
-from pydantic import BaseModel
-from typing import TypedDict, Annotated
-import operator
-import asyncio
-from langgraph.graph import StateGraph, START, END
-from langgraph.checkpoint.memory import MemorySaver
+import json
+import logging
+from logging import DEBUG
+from typing import TypedDict
+
 import litellm
 from litellm.caching.caching import Cache
-import logging
-import json
+from langgraph.graph import StateGraph, END
+from langgraph.checkpoint.memory import MemorySaver
 
 from agents.utils.registry import AgentRegistry
 from agents.utils.schemas import Plan, AgentOutput
 from memory import RedisMemoryManager
 
 logger = logging.getLogger(__name__)
+logger.setLevel(DEBUG)
 logging.basicConfig(filename="../app.log")
 
 class AgentState(TypedDict):
@@ -36,7 +36,7 @@ class Orchestrator():
         planner = self.registry.get_agent(name="planner")
         self.memory.add_message(state["session_id"], "user", state["query"])
         plan = await planner.create_plan(state["query"])
-
+        logger.debug(plan)
         return {"plan": plan}
     
     async def execute_node(self, state: AgentState) -> dict[str, list[dict]]:
@@ -49,7 +49,7 @@ class Orchestrator():
 
             context = {"plan_logic": current_plan.thought_process}
             context["memory"] = self.memory.get_context(session_id)
-
+            logger.debug(f"Task: {task.description} | Agent: {task.agent}")
             output = await agent.run_agent(
                 task.description,
                 context=context
