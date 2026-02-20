@@ -39,12 +39,12 @@ class Orchestrator():
         logger.debug(f"Plan: {plan}")
         return {"plan": plan}
     
+
     async def execute_node(self, state: AgentState) -> dict[str, list[dict]]:
         current_plan = state["plan"]
         session_id = state.get("session_id")
 
         new_results = []
-        
         for task in current_plan.tasks:
             agent = self.registry.get_agent(task.agent)
             context = {"plan_logic": current_plan.thought_process}
@@ -60,6 +60,32 @@ class Orchestrator():
                             output.content, agent=task.agent)
             logger.debug(f"Results: {new_results}")
         return {"results": new_results}
+
+    async def execute_node_stream(self, state: AgentState):
+        """
+        Streaming version of execute_node. Yields each chunk from agent as it arrives.
+        """
+        current_plan = state["plan"]
+        session_id = state.get("session_id")
+
+        for task in current_plan.tasks:
+            agent = self.registry.get_agent(task.agent)
+
+            context = {
+                "plan_logic": current_plan.thought_process,
+                "memory": self.memory.get_context(session_id)
+            }
+
+            logger.debug(f"Context: {context}")
+            logger.debug(f"Task: {task.description} | Agent: {task.agent}")
+
+            content_buffer = ""
+
+            async for chunk in agent.run_agent_stream(task.description, context=context):
+                if chunk:
+                    content_buffer += chunk
+                    yield {"agent": task.agent, "content": chunk}
+            self.memory.add_message(session_id, "assistant", content_buffer, agent=task.agent)
     
     def compile_workflow(self):
         workflow = StateGraph(AgentState)
@@ -81,20 +107,20 @@ class Orchestrator():
             "results": []
         }
 
-        config = {"configurable": {"thread_id": session_id}}
+        planner = self.registry.get_agent(name="planner")
+        self.memory.add_message(session_id, "user", query)
+        plan = await planner.create_plan(query)
+        input_state["plan"] = plan
 
-        async for event in self.workflow.astream(
-            input_state,
-            config=config,
-            stream_mode="updates"
-        ):
-            node_name = list(event.keys())[0]
-            node_data = event[node_name]
+        last_agent = None
 
-            if node_name == "executor":
-                for result in node_data.get("results", []):
-                    if hasattr(result, 'content'):
-                        formatted_content = f"\n\n{result.content}\n\n"
-                        yield f"data: {json.dumps({'content': formatted_content, 'agent': result.agent})}\n\n"
-                    elif node_name == "planner":
-                        logger.info(f"Plan created for session {session_id}")
+        async for chunk in self.execute_node_stream(input_state):
+            agent = chunk["agent"]
+            content = chunk["content"]
+            if isinstance(content, dict):
+                content = content.get("content", str(content))
+            if last_agent is not None and agent != last_agent:
+                yield f"data: {json.dumps({'content': '\n\n', 'agent': agent})}\n\n"
+
+            last_agent = agent
+            yield f"data: {json.dumps({'content': content, 'agent': agent})}\n\n"

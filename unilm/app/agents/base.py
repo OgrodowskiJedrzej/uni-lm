@@ -20,6 +20,7 @@ class BaseModel(ABC):
         with open(path, 'r', encoding='utf-8') as f:
             return yaml.safe_load(f)
 
+
     async def run_agent(self, task: str, context: dict | None = None):
         response = await litellm.acompletion(
             model = self.model,
@@ -30,6 +31,18 @@ class BaseModel(ABC):
             temperature = self.temperature,
             response_format=AgentOutput
         )
-    
         content = response.choices[0].message.content
         return AgentOutput.model_validate_json(content)
+
+    async def run_agent_stream(self, task: str, context: dict | None = None):
+        async for chunk in await litellm.acompletion(
+            model=self.model,
+            messages=[
+                {"role": "system", "content": self.system_prompt},
+                {"role": "user", "content": f"Context: {context}\n\nTask: {task}"}
+            ],
+            temperature=self.temperature,
+            stream=True
+        ):
+            if hasattr(chunk.choices[0].delta, "content"):
+                yield chunk.choices[0].delta.content

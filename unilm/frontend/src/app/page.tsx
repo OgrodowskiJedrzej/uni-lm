@@ -11,7 +11,7 @@ interface Message {
   content: string;
 }
 
-export default function DiscordChat() {
+export default function Chat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -52,33 +52,30 @@ export default function DiscordChat() {
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let accumulatedContent = '';
+      let lineBuffer = '';
 
       while (true) {
         const { value, done } = await reader.read();
         if (done) break;
 
-        const chunk = decoder.decode(value);
-        const lines = chunk.split('\n');
+        lineBuffer += decoder.decode(value, { stream: true });
+        const lines = lineBuffer.split('\n');
+        lineBuffer = lines.pop() || ''; 
 
         for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            try {
-              const rawData = line.replace('data: ', '').trim();
-              const json = JSON.parse(rawData)
+          if (!line.startsWith('data: ')) continue;
 
-              const newContent = json.content;
-              accumulatedContent += newContent;
+          try {
+            const json = JSON.parse(line.substring(6));
+            if (json.content) {
+              accumulatedContent += json.content;
 
-              setMessages(prev => prev.map(m =>
-                m.id === assistantMsgId ? { ...m, content: accumulatedContent } : m
-              ));
-            } catch (e) {
-              const plainText = line.replace('data: ', '');
-              accumulatedContent += plainText;
               setMessages(prev => prev.map(m =>
                 m.id === assistantMsgId ? { ...m, content: accumulatedContent } : m
               ));
             }
+          } catch (e) {
+            // Ignore incomplete JSON chunks
           }
         }
       }
