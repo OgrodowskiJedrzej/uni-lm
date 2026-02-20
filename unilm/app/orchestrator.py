@@ -34,7 +34,7 @@ class Orchestrator():
     
     async def plan_node(self, state: AgentState) -> dict[str, dict]:
         planner = self.registry.get_agent(name="planner")
-        self.memory.add_message(state["session_id"], "user", state["query"])
+        await self.memory.add_message(state["session_id"], "user", state["query"])
         plan = await planner.create_plan(state["query"])
         logger.debug(f"Plan: {plan}")
         return {"plan": plan}
@@ -56,8 +56,7 @@ class Orchestrator():
                 context=context
             )
             new_results.append(output)
-            self.memory.add_message(session_id, "assistant",
-                            output.content, agent=task.agent)
+            await self.memory.add_message(session_id, "assistant", output.content, agent=task.agent)
             logger.debug(f"Results: {new_results}")
         return {"results": new_results}
 
@@ -85,7 +84,7 @@ class Orchestrator():
                 if chunk:
                     content_buffer += chunk
                     yield {"agent": task.agent, "content": chunk}
-            self.memory.add_message(session_id, "assistant", content_buffer, agent=task.agent)
+            await self.memory.add_message(session_id, "assistant", content_buffer, agent=task.agent)
     
     def compile_workflow(self):
         workflow = StateGraph(AgentState)
@@ -108,7 +107,7 @@ class Orchestrator():
         }
 
         planner = self.registry.get_agent(name="planner")
-        self.memory.add_message(session_id, "user", query)
+        await self.memory.add_message(session_id, "user", query)
         plan = await planner.create_plan(query)
         input_state["plan"] = plan
 

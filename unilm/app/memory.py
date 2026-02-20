@@ -15,14 +15,14 @@ class RedisMemoryManager:
         self.threshold = history_threshold
         self.summerize_agent = agent
     
-    def add_message(self, session_id: str, role: str, content: str, agent: Optional[str] = None):
+    async def add_message(self, session_id: str, role: str, content: str, agent: Optional[str] = None):
         """Add message and trigger summarization if threshold exceeded."""
         key = f"session:{session_id}:history"
         self.redis.rpush(key, json.dumps({"role": role, "content": content, "agent": agent}))
         self.redis.expire(key, 86400)
         
         if self.redis.llen(key) >= self.threshold:
-            self._summarize(session_id)
+            await self._summarize(session_id)
     
     def get_history(self, session_id: str) -> list[dict]:
         """Get recent history (after summarization keeps only last 3)."""

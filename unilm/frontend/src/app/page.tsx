@@ -19,11 +19,10 @@ export default function Chat() {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    let id = localStorage.getItem('chat_session_id');
+    let id = sessionStorage.getItem('chat_session_id');
     if (!id) {
       id = uuidv4();
-      localStorage.setItem('chat_session_id', id);
-      console.log(id);
+      sessionStorage.setItem('chat_session_id', id);
     }
     setSessionId(id);
   }, []);
