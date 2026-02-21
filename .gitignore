@@ -45,3 +45,7 @@ next-env.d.ts
 
 node_modules/
 .next
+.ruff_cache
+.vscode/
+
+*.log
