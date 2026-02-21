@@ -4,7 +4,7 @@ from fastapi import APIRouter, Query
 from fastapi.responses import StreamingResponse
 import uuid
 
-from app.orchestrator import Orchestrator
+from orchestrator import Orchestrator
 
 logger = logging.getLogger(__name__)
 

@@ -1,4 +1,4 @@
-from app.agents.base import BaseModel
+from agents.base import BaseModel
 
 
 class CodingAgent(BaseModel):

@@ -3,13 +3,13 @@ from abc import ABC
 
 import litellm
 
-from app.agents.utils.schemas import AgentOutput
+from agents.utils.schemas import AgentOutput
 
 
 class BaseModel(ABC):
     def __init__(self, name: str):
         self.config = self._load_config(
-            "/Users/jendras/Projects/uni-lm/unilm/app/prompts.yaml"
+            "prompts.yaml"
         )
 
         # configs defined in prompts.yaml

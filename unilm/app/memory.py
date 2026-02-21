@@ -1,3 +1,4 @@
+import os
 import json
 from typing import Optional
 
@@ -12,10 +13,12 @@ class RedisMemoryManager:
     def __init__(
         self,
         agent: BaseModel,
-        redis_host: str = "localhost",
-        redis_port: int = 6379,
+        redis_host: str = None,
+        redis_port: int = None,
         history_threshold: int = 10,
     ):
+        redis_host = redis_host or os.environ.get("REDIS_HOST", "localhost")
+        redis_port = redis_port or int(os.environ.get("REDIS_PORT", 6379))
         self.redis = redis.Redis(
             host=redis_host, port=redis_port, decode_responses=True
         )
