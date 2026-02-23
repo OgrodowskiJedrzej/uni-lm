@@ -1,5 +1,8 @@
 services:
   frontend:
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
     build:
       context: ./frontend
       dockerfile: Dockerfile.frontend
@@ -8,9 +11,13 @@ services:
     depends_on:
       - backend
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=development
+    command: npm run dev -- -H 0.0.0.0 -p 3000
 
   backend:
+    volumes:
+        - ./backend/unilm:/app/unilm
+        - ./backend/prompts.yaml:/app/prompts.yaml
     build:
       context: ./backend
       dockerfile: Dockerfile.backend
@@ -23,6 +30,7 @@ services:
       - REDIS_PORT=6379
     env_file:
       - .env
+    command: uvicorn unilm.main:app --host 0.0.0.0 --port 8000 --reload
 
   redis:
     image: redis:7-alpine

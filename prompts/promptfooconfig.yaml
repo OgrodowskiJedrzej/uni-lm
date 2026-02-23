@@ -1,0 +1,12 @@
+prompts:
+  - "file://.prompts_cache/coder.txt"
+
+providers:
+  - id: openai:gpt-4o-mini
+
+tests:
+  - vars:
+      request: "Napisz hello world w Pythonie"
+    assert:
+      - type: icontains
+        value: "print"

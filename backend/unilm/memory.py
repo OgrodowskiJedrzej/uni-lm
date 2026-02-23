@@ -4,7 +4,7 @@ from typing import Optional
 
 import redis
 
-from agents.base import BaseModel
+from unilm.agents.base import BaseModel
 
 
 class RedisMemoryManager:

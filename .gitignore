@@ -46,6 +46,14 @@ next-env.d.ts
 node_modules/
 .next
 .ruff_cache
-.vscode/
+.vscode
 
 *.log
+
+todo.txt
+
+prompts/.prompts_cache
+
+.deepeval
+
+.pytest_cache

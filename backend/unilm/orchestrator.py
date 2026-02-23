@@ -3,9 +3,9 @@ import logging
 from logging import DEBUG
 from typing import TypedDict
 
-from agents.utils.registry import AgentRegistry
-from agents.utils.schemas import Plan, AgentOutput
-from memory import RedisMemoryManager
+from unilm.agents.utils.registry import AgentRegistry
+from unilm.agents.utils.schemas import Plan, AgentOutput
+from unilm.memory import RedisMemoryManager
 
 logger = logging.getLogger(__name__)
 logger.setLevel(DEBUG)

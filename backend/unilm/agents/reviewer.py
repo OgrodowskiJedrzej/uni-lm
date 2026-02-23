@@ -1,4 +1,4 @@
-from agents.base import BaseModel
+from unilm.agents.base import BaseModel
 
 
 class ReviewerAgent(BaseModel):

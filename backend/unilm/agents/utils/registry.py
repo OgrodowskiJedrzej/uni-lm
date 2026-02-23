@@ -1,11 +1,11 @@
 from typing import overload, Literal
 
-from agents.base import BaseModel
-from agents.coding_agent import CodingAgent
-from agents.planner import PlannerAgent
-from agents.summerizer import SummerizerAgent
-from agents.theoretician import TheoreticianAgent
-from agents.reviewer import ReviewerAgent
+from unilm.agents.base import BaseModel
+from unilm.agents.coding_agent import CodingAgent
+from unilm.agents.planner import PlannerAgent
+from unilm.agents.summerizer import SummerizerAgent
+from unilm.agents.theoretician import TheoreticianAgent
+from unilm.agents.reviewer import ReviewerAgent
 
 
 class AgentRegistry:

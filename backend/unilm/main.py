@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from api.v1.api import api_router
+from unilm.api.v1.api import api_router
 
 
 app = FastAPI(title="University Agentic AI API", version="1.0.0")

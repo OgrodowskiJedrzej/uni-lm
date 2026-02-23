@@ -1,7 +1,7 @@
 import litellm
 
-from agents.base import BaseModel
-from agents.utils.schemas import Plan
+from unilm.agents.base import BaseModel
+from unilm.agents.utils.schemas import Plan
 
 
 class PlannerAgent(BaseModel):

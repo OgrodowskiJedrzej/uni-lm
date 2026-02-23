@@ -1,0 +1,12 @@
+.git
+.github
+.prompts_cache
+__pycache__
+*.pyc
+.env
+.venv
+node_modules
+.deepeval
+.vscode
+README.md
+todo.txt

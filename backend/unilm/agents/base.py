@@ -1,9 +1,11 @@
 import yaml
 from abc import ABC
+import os
+from pathlib import Path
 
 import litellm
 
-from agents.utils.schemas import AgentOutput
+from unilm.agents.utils.schemas import AgentOutput
 
 
 class BaseModel(ABC):
@@ -16,7 +18,18 @@ class BaseModel(ABC):
         self.system_prompt = self.config["agents"][name]["system_prompt"]
         self.temperature = self.config["agents"][name]["temperature"]
 
-    def _load_config(self, path: str):
+    def _load_config(self, filename="prompts.yaml"):
+        env_path = os.getenv("PROMPTS_CONFIG_PATH")
+        if env_path:
+            path = Path(env_path)
+        else:
+            base_dir = Path(__file__).resolve().parent.parent.parent
+            path = base_dir / filename
+
+        if not path.exists():
+            raise FileNotFoundError(
+                f"Błąd: Nie znaleziono pliku promptów pod ścieżką: {path.absolute()}")
+
         with open(path, "r", encoding="utf-8") as f:
             return yaml.safe_load(f)
 
