@@ -46,7 +46,7 @@ jobs:
         run: uv python install 3.12
 
       - name: Install dependencies
-        run: uv sync --frozen --directory backend
+        run: uv sync --frozen --group dev --directory backend
 
       - name: Run tests
         run: PYTHONPATH=. uv run pytest --maxfail=1 --disable-warnings -v
