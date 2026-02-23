@@ -1,7 +1,7 @@
 """Tests for the agent registry."""
 
 import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 from unilm.agents.utils.registry import AgentRegistry
 from unilm.agents.base import BaseModel

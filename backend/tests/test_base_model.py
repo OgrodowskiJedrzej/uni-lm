@@ -2,8 +2,7 @@
 
 import pytest
 import yaml
-from unittest.mock import MagicMock, patch, AsyncMock
-from pydantic import ValidationError
+from unittest.mock import MagicMock, patch
 
 from unilm.agents.base import BaseModel
 from unilm.agents.utils.schemas import AgentOutput
@@ -28,9 +27,7 @@ class TestBaseModel:
     @pytest.fixture
     def mock_base_model(self, mock_config):
         """Create a BaseModel instance with mocked config."""
-        with patch.object(
-            BaseModel, "_load_config", return_value=mock_config
-        ):
+        with patch.object(BaseModel, "_load_config", return_value=mock_config):
             model = BaseModel(name="coder")
             return model
 
@@ -59,7 +56,9 @@ agents:
             )
             with patch("yaml.safe_load", return_value=yaml.safe_load(config_content)):
                 with patch.object(
-                    BaseModel, "_load_config", return_value=yaml.safe_load(config_content)
+                    BaseModel,
+                    "_load_config",
+                    return_value=yaml.safe_load(config_content),
                 ):
                     model = BaseModel(name="test_agent")
                     assert model.model == "gpt-4"
@@ -137,7 +136,9 @@ agents:
             mock_completion.return_value = mock_stream()
 
             result = []
-            async for chunk in mock_base_model.run_agent_stream("coder", context=context):
+            async for chunk in mock_base_model.run_agent_stream(
+                "coder", context=context
+            ):
                 result.append(chunk)
 
             assert len(result) > 0
@@ -164,12 +165,8 @@ agents:
         ]
 
         for config_case in configs:
-            mock_config["agents"]["coder"]["temperature"] = config_case[
-                "temperature"
-            ]
-            with patch.object(
-                BaseModel, "_load_config", return_value=mock_config
-            ):
+            mock_config["agents"]["coder"]["temperature"] = config_case["temperature"]
+            with patch.object(BaseModel, "_load_config", return_value=mock_config):
                 model = BaseModel(name="coder")
                 assert model.temperature == config_case["expected"]
 

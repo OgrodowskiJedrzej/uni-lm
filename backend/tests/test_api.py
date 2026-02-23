@@ -2,12 +2,11 @@
 
 import pytest
 import json
-from unittest.mock import MagicMock, AsyncMock, patch
+from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 
 from unilm.main import app
-from unilm.agents.utils.schemas import Plan, Task, AgentOutput
 
 
 @pytest.fixture
@@ -40,6 +39,7 @@ class TestAPIEndpoints:
     def test_ask_endpoint_without_session(self, client):
         """Test ask endpoint without session_id."""
         with patch("unilm.api.v1.api.orchestrator") as mock_orchestrator:
+
             async def mock_stream(*args, **kwargs):
                 yield b'data: {"content": "test", "agent": "coder"}\n\n'
 
@@ -54,20 +54,20 @@ class TestAPIEndpoints:
     def test_ask_endpoint_with_session(self, client):
         """Test ask endpoint with session_id."""
         with patch("unilm.api.v1.api.orchestrator") as mock_orchestrator:
+
             async def mock_stream(*args, **kwargs):
                 yield b'data: {"content": "response", "agent": "coder"}\n\n'
 
             mock_orchestrator.get_stream_response.return_value = mock_stream()
 
-            response = client.get(
-                "/api/v1/ask?question=Test&session_id=session-123"
-            )
+            response = client.get("/api/v1/ask?question=Test&session_id=session-123")
 
             assert response.status_code == 200
 
     def test_ask_endpoint_empty_question(self, client):
         """Test ask endpoint with empty question."""
         with patch("unilm.api.v1.api.orchestrator") as mock_orchestrator:
+
             async def mock_stream(*args, **kwargs):
                 yield b'data: {"content": "", "agent": "coder"}\n\n'
 
@@ -76,7 +76,6 @@ class TestAPIEndpoints:
             response = client.get("/api/v1/ask?question=")
 
             assert response.status_code == 200
-            
 
     def test_ask_endpoint_generates_session_if_not_provided(self, client):
         """Test that ask endpoint generates session_id if not provided."""
@@ -98,6 +97,7 @@ class TestAPIEndpoints:
     def test_streaming_response_format(self, client):
         """Test that streaming response has correct format."""
         with patch("unilm.api.v1.api.orchestrator") as mock_orchestrator:
+
             async def mock_stream(*args, **kwargs):
                 data1 = json.dumps({"content": "Part1", "agent": "coder"})
                 data2 = json.dumps({"content": "Part2", "agent": "coder"})
@@ -119,12 +119,18 @@ class TestAPIEndpoints:
     def test_middleware_configuration(self, client):
         """Test that CORS middleware is properly configured."""
         response = client.options(
-            "/ask", headers={"Origin": "http://localhost:3000", "Access-Control-Request-Method": "POST"})
-        assert response.status_code == 200  
+            "/ask",
+            headers={
+                "Origin": "http://localhost:3000",
+                "Access-Control-Request-Method": "POST",
+            },
+        )
+        assert response.status_code == 200
 
     def test_ask_question_special_characters(self, client):
         """Test ask endpoint with special characters."""
         with patch("unilm.api.v1.api.orchestrator") as mock_orchestrator:
+
             async def mock_stream(*args, **kwargs):
                 yield b'data: {"content": "response", "agent": "coder"}\n\n'
 
@@ -146,6 +152,7 @@ class TestAPIEndpoints:
     def test_ask_with_long_question(self, client):
         """Test ask endpoint with very long question."""
         with patch("unilm.api.v1.api.orchestrator") as mock_orchestrator:
+
             async def mock_stream(*args, **kwargs):
                 yield b'data: {"content": "response", "agent": "coder"}\n\n'
 

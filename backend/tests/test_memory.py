@@ -69,7 +69,6 @@ class TestRedisMemoryManager:
 
         await memory_manager.add_message(session_id, "user", "Test message")
 
-        expected_key = f"session:{session_id}:history"
         assert mock_redis.rpush.called
         assert mock_redis.expire.called
 
@@ -94,11 +93,13 @@ class TestRedisMemoryManager:
         mock_redis.rpush = MagicMock(return_value=3)
         mock_redis.expire = MagicMock()
         mock_redis.llen = MagicMock(return_value=3)  # At threshold
-        mock_redis.lrange = MagicMock(return_value=[
-            json.dumps({"role": "user", "content": "msg1", "agent": None}),
-            json.dumps({"role": "assistant", "content": "resp1", "agent": "coder"}),
-            json.dumps({"role": "user", "content": "msg2", "agent": None}),
-        ])
+        mock_redis.lrange = MagicMock(
+            return_value=[
+                json.dumps({"role": "user", "content": "msg1", "agent": None}),
+                json.dumps({"role": "assistant", "content": "resp1", "agent": "coder"}),
+                json.dumps({"role": "user", "content": "msg2", "agent": None}),
+            ]
+        )
 
         with patch.object(memory_manager, "_summarize", new_callable=AsyncMock):
             await memory_manager.add_message(session_id, "user", "Message")
@@ -132,9 +133,11 @@ class TestRedisMemoryManager:
         """Test getting context without summary."""
         session_id = "test-session"
         mock_redis.get = MagicMock(return_value=None)
-        mock_redis.lrange = MagicMock(return_value=[
-            json.dumps({"role": "user", "content": "Test message", "agent": None}),
-        ])
+        mock_redis.lrange = MagicMock(
+            return_value=[
+                json.dumps({"role": "user", "content": "Test message", "agent": None}),
+            ]
+        )
 
         context = memory_manager.get_context(session_id)
 
@@ -146,9 +149,11 @@ class TestRedisMemoryManager:
         session_id = "test-session"
         summary_text = "This is a summary"
         mock_redis.get = MagicMock(return_value=summary_text)
-        mock_redis.lrange = MagicMock(return_value=[
-            json.dumps({"role": "user", "content": "Question", "agent": None}),
-        ])
+        mock_redis.lrange = MagicMock(
+            return_value=[
+                json.dumps({"role": "user", "content": "Question", "agent": None}),
+            ]
+        )
 
         context = memory_manager.get_context(session_id)
 
@@ -178,9 +183,8 @@ class TestRedisMemoryManager:
         mock_redis.llen = MagicMock(return_value=1)
 
         import asyncio
-        asyncio.run(
-            memory_manager.add_message(session_id, role, content, agent=agent)
-        )
+
+        asyncio.run(memory_manager.add_message(session_id, role, content, agent=agent))
 
         # Check that rpush was called with JSON serialized data
         call_args = mock_redis.rpush.call_args

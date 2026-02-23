@@ -43,7 +43,7 @@ class TestTaskSchema:
 
     def test_task_special_characters(self):
         """Test Task with special characters in description."""
-        desc = "Write code to solve @#$%^&*() problem with '\"strings\""
+        desc = 'Write code to solve @#$%^&*() problem with \'"strings"'
         task = Task(agent="coder", description=desc)
 
         assert task.description == desc
@@ -95,10 +95,7 @@ class TestPlanSchema:
 
     def test_plan_many_tasks(self):
         """Test Plan with many tasks."""
-        tasks = [
-            Task(agent="theoretician", description=f"Task {i}")
-            for i in range(10)
-        ]
+        tasks = [Task(agent="theoretician", description=f"Task {i}") for i in range(10)]
         plan = Plan(tasks=tasks, thought_process="Complex plan")
 
         assert len(plan.tasks) == 10
@@ -124,12 +121,12 @@ class TestPlanSchema:
 
     def test_plan_json_deserialization(self):
         """Test Plan JSON deserialization."""
-        json_str = '''{
+        json_str = """{
             "tasks": [
                 {"agent": "coder", "description": "Write code"}
             ],
             "thought_process": "Implementation plan"
-        }'''
+        }"""
 
         plan = Plan.model_validate_json(json_str)
 
@@ -139,7 +136,9 @@ class TestPlanSchema:
 
     def test_plan_complex_thought_process(self):
         """Test Plan with complex thought process."""
-        complex_thought = "1. Break down the problem\n2. Design solution\n3. Implement\n4. Test"
+        complex_thought = (
+            "1. Break down the problem\n2. Design solution\n3. Implement\n4. Test"
+        )
         tasks = [Task(agent="coder", description="Implementation")]
         plan = Plan(tasks=tasks, thought_process=complex_thought)
 
@@ -151,10 +150,7 @@ class TestAgentOutputSchema:
 
     def test_agent_output_creation_coder(self):
         """Test creating AgentOutput for coder."""
-        output = AgentOutput(
-            agent="coder",
-            content="def hello():\n    print('hello')"
-        )
+        output = AgentOutput(agent="coder", content="def hello():\n    print('hello')")
 
         assert output.agent == "coder"
         assert "def hello" in output.content
@@ -162,8 +158,7 @@ class TestAgentOutputSchema:
     def test_agent_output_creation_theoretician(self):
         """Test creating AgentOutput for theoretician."""
         output = AgentOutput(
-            agent="theoretician",
-            content="The solution involves analyzing..."
+            agent="theoretician", content="The solution involves analyzing..."
         )
 
         assert output.agent == "theoretician"
@@ -251,7 +246,7 @@ class TestSchemasIntegration:
                 Task(agent="theoretician", description="Analyze"),
                 Task(agent="coder", description="Implement"),
             ],
-            thought_process="Analysis then implementation"
+            thought_process="Analysis then implementation",
         )
 
         # Create outputs

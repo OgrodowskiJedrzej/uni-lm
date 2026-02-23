@@ -1,7 +1,6 @@
 """Tests for the orchestrator."""
 
 import pytest
-import json
 from unittest.mock import MagicMock, AsyncMock, patch
 
 from unilm.orchestrator import Orchestrator, AgentState
@@ -19,16 +18,17 @@ class TestOrchestrator:
         registry = MagicMock(spec=AgentRegistry)
 
         mock_planner = MagicMock()
-        mock_planner.create_plan = AsyncMock(return_value=Plan(
-            tasks=[Task(agent="coder", description="Write code")],
-            thought_process="Plan logic"
-        ))
+        mock_planner.create_plan = AsyncMock(
+            return_value=Plan(
+                tasks=[Task(agent="coder", description="Write code")],
+                thought_process="Plan logic",
+            )
+        )
 
         mock_coder = MagicMock()
-        mock_coder.run_agent = AsyncMock(return_value=AgentOutput(
-            agent="coder",
-            content="def test(): pass"
-        ))
+        mock_coder.run_agent = AsyncMock(
+            return_value=AgentOutput(agent="coder", content="def test(): pass")
+        )
 
         # Inicjalizujemy jako MagicMock, będziemy nadpisywać side_effect w konkretnych testach
         mock_coder.run_agent_stream = MagicMock()
@@ -54,7 +54,9 @@ class TestOrchestrator:
         """Create an Orchestrator instance with mocks."""
         # Używamy pełnych ścieżek do patchowania zgodnie ze strukturą unilm.app
         with patch("unilm.orchestrator.AgentRegistry", return_value=mock_registry[0]):
-            with patch("unilm.orchestrator.RedisMemoryManager", return_value=mock_memory):
+            with patch(
+                "unilm.orchestrator.RedisMemoryManager", return_value=mock_memory
+            ):
                 orch = Orchestrator()
                 return orch, mock_registry[1], mock_memory
 
@@ -83,7 +85,7 @@ class TestOrchestrator:
         orch, agents, memory = orchestrator
         plan = Plan(
             tasks=[Task(agent="coder", description="Write code")],
-            thought_process="Plan logic"
+            thought_process="Plan logic",
         )
         state = {
             "query": "Test",
@@ -113,7 +115,7 @@ class TestOrchestrator:
 
         plan = Plan(
             tasks=[Task(agent="coder", description="Stream task")],
-            thought_process="Test"
+            thought_process="Test",
         )
         state = {
             "query": "Test",
@@ -177,10 +179,16 @@ class TestOrchestrator:
                 Task(agent="theoretician", description="Analyze"),
                 Task(agent="coder", description="Code"),
             ],
-            thought_process="Multi-step"
+            thought_process="Multi-step",
         )
-        state = {"query": "Test", "plan": plan, "results": [],
-                 "final_answer": "", "summary": "", "session_id": "test"}
+        state = {
+            "query": "Test",
+            "plan": plan,
+            "results": [],
+            "final_answer": "",
+            "summary": "",
+            "session_id": "test",
+        }
 
         result_chunks = []
         async for chunk in orch.execute_node_stream(state):
@@ -205,8 +213,10 @@ class TestOrchestrator:
         assert memory.add_message.called
         # Ostatnie wywołanie powinno być rolą assistant
         last_call_args = memory.add_message.call_args_list[-1]
-        assert "assistant" in last_call_args[0] or last_call_args[1].get(
-            'role') == 'assistant'
+        assert (
+            "assistant" in last_call_args[0]
+            or last_call_args[1].get("role") == "assistant"
+        )
 
     def test_agent_state_structure(self):
         """Test AgentState TypedDict structure."""
