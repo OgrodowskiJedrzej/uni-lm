@@ -3,9 +3,6 @@ import logging
 from logging import DEBUG
 from typing import TypedDict
 
-from langgraph.graph import StateGraph, END
-from langgraph.checkpoint.memory import MemorySaver
-
 from agents.utils.registry import AgentRegistry
 from agents.utils.schemas import Plan, AgentOutput
 from memory import RedisMemoryManager
@@ -30,8 +27,6 @@ class Orchestrator:
         self.memory = RedisMemoryManager(
             history_threshold=10, agent=self.registry.get_agent("summerizer")
         )
-        self.checkpointer = MemorySaver()
-        self.workflow = self.compile_workflow()
 
     async def plan_node(self, state: AgentState) -> dict[str, dict]:
         planner = self.registry.get_agent(name="planner")
@@ -88,18 +83,6 @@ class Orchestrator:
             await self.memory.add_message(
                 session_id, "assistant", content_buffer, agent=task.agent
             )
-
-    def compile_workflow(self):
-        workflow = StateGraph(AgentState)
-
-        workflow.add_node("planner", self.plan_node)
-        workflow.add_node("executor", self.execute_node)
-
-        workflow.set_entry_point("planner")
-        workflow.add_edge("planner", "executor")
-        workflow.add_edge("executor", END)
-
-        return workflow.compile(checkpointer=self.checkpointer)
 
     async def get_stream_response(self, query: str, session_id: str):
         input_state = {

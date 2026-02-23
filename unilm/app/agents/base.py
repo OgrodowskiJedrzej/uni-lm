@@ -8,9 +8,7 @@ from agents.utils.schemas import AgentOutput
 
 class BaseModel(ABC):
     def __init__(self, name: str):
-        self.config = self._load_config(
-            "prompts.yaml"
-        )
+        self.config = self._load_config("prompts.yaml")
 
         # configs defined in prompts.yaml
         self.name = name
