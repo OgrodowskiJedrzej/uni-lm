@@ -9,6 +9,7 @@ on:
 permissions:
   contents: read
   pull-requests: write
+  id-token: write
 
 jobs:
   code-quality:
@@ -56,7 +57,6 @@ jobs:
 
   prompt-eval:
     needs: code-quality
-    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -75,6 +75,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-promptfoo-
 
+      - name: Install dependencies
+        run: pip install pyyaml
+
       - name: Prepare prompts
         run: python prompts/prepare_prompts_for_eval.py
 
@@ -85,3 +88,36 @@ jobs:
           github-token: ${{ secrets.GH_TOKEN }}
           config: 'prompts/promptfooconfig.yaml'
           cache-path: ~/.cache/promptfoo
+          disable-comment: true
+  
+  build-and-push:
+    needs: [ tests, prompt-eval ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        
+      - name: Login to ACR
+        run: az acr login --name ${{ secrets.ACR_NAME }}
+
+      - name: Build and Push Backend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile.backend
+          push: true
+          tags: ${{ secrets.ACR_NAME }}.azurecr.io/backend:${{ github.sha }}
+      
+      - name: Build and Push Frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile.frontend
+          push: true
+          tags: ${{ secrets.ACR_NAME }}.azurecr.io/frontend:${{ github.sha }}
