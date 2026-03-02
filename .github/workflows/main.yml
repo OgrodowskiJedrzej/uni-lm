@@ -142,7 +142,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: OgrodowskiJedrzej/unilm-gitops
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITOPS_PAT }}
           path: gitops-repo
           persist-credentials: true
 
