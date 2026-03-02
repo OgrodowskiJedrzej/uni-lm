@@ -9,4 +9,4 @@ tests:
       request: "Write function to print 'Hello World' in Python."
     assert:
       - type: icontains
-        value: "print"
+        value: "python"
