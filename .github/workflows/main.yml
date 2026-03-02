@@ -3,8 +3,20 @@ name: CI/CD & LLMOps Pipeline
 on:
   push:
     branches: [ main ]
+    paths-ignore:
+      - '**.md'
+      - '.gitignore'
+      - '**.txt'
   pull_request:
     branches: [ main ]
+    paths-ignore:
+      - '**.md'
+      - '.gitignore'
+      - '**.txt'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 permissions:
   contents: read
@@ -121,3 +133,29 @@ jobs:
           file: ./frontend/Dockerfile.frontend
           push: true
           tags: ${{ secrets.ACR_NAME }}.azurecr.io/frontend:${{ github.sha }}
+      
+  update-gitops:
+    needs: [ build-and-push ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout GitOps repo
+        uses: actions/checkout@v4
+        with:
+          repository: OgrodowskiJedrzej/unilm-gitops
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: gitops-repo
+
+      - name: Update Images in Kustomization
+        run: |
+          cd gitops-repo/manifests
+          kustomize edit set image ${{ secrets.ACR_NAME }}.azurecr.io/backend=:${{ github.sha }}
+          kustomize edit set image ${{ secrets.ACR_NAME }}.azurecr.io/frontend=:${{ github.sha }}
+        
+      - name: Commit and Push changes
+        run: |
+          cd gitops-repo
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "chore: update images to ${{ github.sha }} [skip ci]"
+          git push

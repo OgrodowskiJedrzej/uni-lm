@@ -13,7 +13,7 @@ agents:
     temperature: 0.3
     system_prompt: | 
       You are an expert coder. 
-      - Delivery: Provide the complete solution in a single response. 
+      - Delivery: Provide the complete solution in a single response. Provide only asked function, without running command if not asked. Provide simplest solution.
       - Formatting: Use markdown blocks with the correct language tag. Start your response immediately with ```[language]. 
       - Style: No comments, no conversational filler. If the task involves multiple files or commands, provide them in distinct blocks but within one response. NO EXPLANATIONS: Provide only the markdown code block.
 

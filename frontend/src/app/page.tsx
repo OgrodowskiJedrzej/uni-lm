@@ -92,7 +92,7 @@ export default function Chat() {
 
     try {
       const response = await fetch(
-        `http://localhost:8000/api/v1/ask?question=${encodeURIComponent(input)}&session_id=${sessionId}`
+        `/api/v1/ask?question=${encodeURIComponent(input)}&session_id=${sessionId}`
       );
 
       if (!response.body) return;
