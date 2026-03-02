@@ -6,7 +6,7 @@ providers:
 
 tests:
   - vars:
-      request: "Napisz hello world w Pythonie"
+      request: "Write function to print 'Hello World' in Python."
     assert:
       - type: icontains
         value: "print"
